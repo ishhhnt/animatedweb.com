@@ -27,7 +27,9 @@ const motion = {
   rotateX: 0,
   rotateY: 0,
   depth: 0,
-  energy: 0
+  energy: 0,
+  tipX: 0,
+  tipY: 0
 };
 
 let particles = [];
@@ -172,14 +174,14 @@ function animate(time) {
   const targetY = pointer.active || !idleDelay ? pointer.targetY : 0;
   const idle = time * 0.001;
 
-  pointer.x = lerp(pointer.x, targetX, 0.075);
-  pointer.y = lerp(pointer.y, targetY, 0.075);
-  pointer.px = lerp(pointer.px || width / 2, pointer.targetPx || width / 2, 0.12);
-  pointer.py = lerp(pointer.py || height / 2, pointer.targetPy || height / 2, 0.12);
+  pointer.x = lerp(pointer.x, targetX, 0.05);
+  pointer.y = lerp(pointer.y, targetY, 0.05);
+  pointer.px = lerp(pointer.px || width / 2, pointer.targetPx || width / 2, 0.08);
+  pointer.py = lerp(pointer.py || height / 2, pointer.targetPy || height / 2, 0.08);
   pointer.speed = lerp(
     pointer.speed,
     Math.hypot(pointer.x - pointer.prevX, pointer.y - pointer.prevY) * 18,
-    0.12
+    0.08
   );
   pointer.prevX = pointer.x;
   pointer.prevY = pointer.y;
@@ -189,15 +191,20 @@ function animate(time) {
   const isMobile = Math.min(width, height) < 640;
   const maxShift = isMobile ? 13 : 10;
   const targetAngle = pointer.x * (isMobile ? 2.25 : 1.7) + pointer.y * -0.35;
-  motion.angleVelocity = lerp(motion.angleVelocity, targetAngle - motion.angle, 0.025);
+  motion.angleVelocity = lerp(motion.angleVelocity, targetAngle - motion.angle, 0.015);
 
-  motion.offsetX = lerp(motion.offsetX, pointer.x * maxShift + idleX, 0.045);
-  motion.offsetY = lerp(motion.offsetY, pointer.y * maxShift * (isMobile ? 0.82 : 0.62) + idleY, 0.045);
-  motion.angle = lerp(motion.angle, targetAngle + motion.angleVelocity * 0.45, 0.042);
-  motion.rotateX = lerp(motion.rotateX, pointer.x * (isMobile ? 2.2 : 1.55), 0.04);
-  motion.rotateY = lerp(motion.rotateY, pointer.y * (isMobile ? -1.75 : -1.25), 0.04);
-  motion.depth = lerp(motion.depth, Math.abs(pointer.x) * 4.5 + Math.abs(pointer.y) * 3, 0.035);
-  motion.energy = lerp(motion.energy, clamp(pointer.speed, 0, 1), 0.07);
+  const offsetLerp = isMobile ? 0.08 : 0.03;
+  motion.offsetX = lerp(motion.offsetX, pointer.x * maxShift + idleX, offsetLerp);
+  motion.offsetY = lerp(motion.offsetY, pointer.y * maxShift * (isMobile ? 0.82 : 0.62) + idleY, offsetLerp);
+  motion.angle = lerp(motion.angle, targetAngle + motion.angleVelocity * 0.45, 0.028);
+  motion.rotateX = lerp(motion.rotateX, pointer.x * (isMobile ? 2.2 : 1.55), 0.025);
+  motion.rotateY = lerp(motion.rotateY, pointer.y * (isMobile ? -1.75 : -1.25), 0.025);
+  motion.depth = lerp(motion.depth, Math.abs(pointer.x) * 4.5 + Math.abs(pointer.y) * 3, 0.02);
+  motion.energy = lerp(motion.energy, clamp(pointer.speed, 0, 1), 0.05);
+
+  // Golden sphere movement - moves in all directions
+  motion.tipX = lerp(motion.tipX, pointer.x * 100, 0.12);
+  motion.tipY = lerp(motion.tipY, pointer.y * 100, 0.12);
 
   if (pointer.speed > 0.32 && Math.random() < pointer.speed * 0.28) {
     addTipTrail();
@@ -214,6 +221,8 @@ function animate(time) {
   root.style.setProperty("--cursor-y", `${pointer.py.toFixed(1)}px`);
   root.style.setProperty("--light-x", `${(50 + pointer.x * 9).toFixed(2)}%`);
   root.style.setProperty("--light-y", `${(46 + pointer.y * 7).toFixed(2)}%`);
+  root.style.setProperty("--tip-x", `${motion.tipX.toFixed(2)}px`);
+  root.style.setProperty("--tip-y", `${motion.tipY.toFixed(2)}px`);
 
   drawParticles();
   requestAnimationFrame(animate);
