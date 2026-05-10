@@ -22,7 +22,9 @@
   --staff-top: 50%;
   --staff-width: 100%;
   --staff-origin-x: 51%;
-  --staff-origin-y: 36.8%;
+  --staff-origin-y: 95%;
+  --tip-x: 0px;
+  --tip-y: 0px;
   color-scheme: dark;
 }
 
@@ -341,19 +343,10 @@ h1 {
   width: var(--staff-width);
   height: 100%;
   transform:
-    perspective(1200px)
-    translate3d(
-      calc(-50% + var(--mx)),
-      calc(-50% + var(--my)),
-      var(--depth)
-    )
-    rotateX(var(--tilt-y))
-    rotateY(var(--tilt-x))
-    rotateZ(var(--tilt));
+    translate(-50%, -50%);
   transform-style: preserve-3d;
   transform-origin: var(--staff-origin-x) var(--staff-origin-y);
   will-change: transform;
-  animation: staffBreath 7s ease-in-out infinite;
   filter: drop-shadow(0 0 calc(12px + var(--energy) * 18px) rgba(255, 148, 49, 0.25));
 }
 
@@ -412,7 +405,7 @@ h1 {
   width: calc(25% + var(--energy) * 5%);
   aspect-ratio: 1;
   border-radius: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(calc(-50% + var(--tip-x)), calc(-50% + var(--tip-y)));
   opacity: calc(0.42 + var(--energy) * 0.45);
   background:
     radial-gradient(circle, rgba(255, 247, 180, 0.82), rgba(255, 153, 38, 0.4) 24%, rgba(255, 76, 22, 0.16) 48%, transparent 72%);
